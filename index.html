@@ -11,7 +11,7 @@
       --panel: #0d0f13;
       --panel-soft: rgba(6, 8, 11, 0.95);
       --border: #242424;
-      --accent: #f5c643; /* Cooke-ish accent */
+      --accent: #f5c643; /* makkelijk te tweaken (Cooke-ish) */
       --accent-soft: rgba(245, 198, 67, 0.18);
       --text: #f7f7f7;
       --text-muted: #979797;
@@ -184,6 +184,10 @@
       flex-wrap: wrap;
     }
 
+    .hint-row span {
+      opacity: 0.9;
+    }
+
     /* =============== CONTROLS =============== */
     .controls {
       display: flex;
@@ -338,7 +342,7 @@
       margin-top: 10px;
     }
 
-    /* Collage layout */
+    /* Collage layout: 5 beelden in een lekkere grid */
     .collage {
       display: grid;
       grid-template-columns: 2fr 1.4fr;
@@ -357,11 +361,30 @@
       display: block;
     }
 
-    .collage-item-1 { grid-column: 1 / 2; grid-row: 1 / 3; }
-    .collage-item-2 { grid-column: 2 / 3; grid-row: 1 / 2; }
-    .collage-item-3 { grid-column: 2 / 3; grid-row: 2 / 3; }
-    .collage-item-4 { grid-column: 1 / 2; grid-row: 3 / 4; }
-    .collage-item-5 { grid-column: 2 / 3; grid-row: 3 / 4; }
+    .collage-item-1 {
+      grid-column: 1 / 2;
+      grid-row: 1 / 3;
+    }
+
+    .collage-item-2 {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+    }
+
+    .collage-item-3 {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+    }
+
+    .collage-item-4 {
+      grid-column: 1 / 2;
+      grid-row: 3 / 4;
+    }
+
+    .collage-item-5 {
+      grid-column: 2 / 3;
+      grid-row: 3 / 4;
+    }
 
     .collage-caption {
       margin-top: 8px;
@@ -373,6 +396,7 @@
       display: none !important;
     }
 
+    /* =============== RESPONSIVE =============== */
     @media (max-width: 900px) {
       .results-grid {
         grid-template-columns: minmax(0, 1fr);
@@ -380,12 +404,31 @@
     }
 
     @media (max-width: 768px) {
-      .app { padding: 10px; }
-      .card-shell { padding: 14px 12px 12px; }
-      .controls { gap: 10px; }
-      .btn { padding: 8px 14px; font-size: 0.8rem; }
-      .card-body img { max-height: 60vh; }
-      .run-meta { flex-wrap: wrap; justify-content: flex-start; }
+      .app {
+        padding: 10px;
+      }
+
+      .card-shell {
+        padding: 14px 12px 12px;
+      }
+
+      .controls {
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+      }
+
+      .card-body img {
+        max-height: 60vh;
+      }
+
+      .run-meta {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
@@ -412,11 +455,13 @@
           <div id="cardIndex" class="card-index">0 / 0</div>
         </div>
 
-        <div class="card-body" id="cardBody"></div>
+        <div class="card-body" id="cardBody">
+          <!-- Image inserted here -->
+        </div>
 
         <div class="card-footer">
           <div class="hint-row">
-            <span>Left = Dislike · Right = Like · Up / ★ = Superlike</span>
+            <span>Left = Dislike &nbsp;·&nbsp; Right = Like &nbsp;·&nbsp; Up / ★ = Superlike</span>
             <span id="perLensInfo"></span>
           </div>
 
@@ -480,99 +525,80 @@
 
   <script>
     /********************************************************
-     * CONFIG – deze namen zijn 1-op-1 jouw bestanden.
-     * Zet al je JPGs in de map "Images" naast deze index.html.
+     * CONFIG – PAS DIT AAN NAAR JOUW BESTANDEN
+     *
+     * Zet je JPG's bijv. in /images en zorg dat de paden kloppen.
+     * Elke lens-serie moet EXACT 5 stills hebben.
      ********************************************************/
     const lensConfig = {
-      "Blackwing": [
-        "Images/Blackwing 1.jpg",
-        "Images/Blackwing 2.jpg",
-        "Images/Blackwing 3.jpg",
-        "Images/Blackwing 4.jpg",
-        "Images/Blackwing 5.jpg",
-        "Images/Blackwing 6.jpg",
-        "Images/Blackwing 7 .jpg",
-        "Images/Blackwing 8.jpg",
-        "Images/Blackwing 9 .jpg",
-        "Images/Blackwing 10.jpg"
+      "Primo": [
+        "images/Primo 1.jpg",
+        "images/Primo 2.jpg",
+        "images/Primo 3.jpg",
+        "images/Primo 4.jpg",
+        "images/Primo 5.jpg"
       ],
       "IronGlass": [
-        "Images/IronGlass 1.jpg",
-        "Images/IronGlass 2.jpg",
-        "Images/IronGlass 3.jpg",
-        "Images/IronGlass 4.jpg",
-        "Images/IronGlass 5.jpg",
-        "Images/IronGlass 6.jpg",
-        "Images/IronGlass 7.jpg"
+        "images/IronGlass 1.jpg",
+        "images/IronGlass 2.jpg",
+        "images/IronGlass 3.jpg",
+        "images/IronGlass 4.jpg",
+        "images/IronGlass 5.jpg"
       ],
-      "Leica R": [
-        "Images/Leica R 1.jpg",
-        "Images/Leica R 2.jpg",
-        "Images/Leica R 3.jpg",
-        "Images/Leica R 4.jpg",
-        "Images/Leica R 5.jpg",
-        "Images/Leica R 6.jpg",
-        "Images/Leica R 7.jpg",
-        "Images/Leica R 8.jpg"
+      "Blackwing": [
+        "images/Blackwing 1.jpg",
+        "images/Blackwing 2.jpg",
+        "images/Blackwing 3.jpg",
+        "images/Blackwing 4.jpg",
+        "images/Blackwing 5.jpg"
       ],
       "Panchro": [
-        "Images/Panchro 1.jpg",
-        "Images/Panchro 2.jpg",
-        "Images/Panchro 3.jpg",
-        "Images/Panchro 4.jpg",
-        "Images/Panchro 5.jpg",
-        "Images/Panchro 6.jpg",
-        "Images/Panchro 7.jpg",
-        "Images/Panchro 8 .jpg",
-        "Images/Panchro 9.jpg",
-        "Images/Panchro 10.jpg"
-      ],
-      "Primo": [
-        "Images/Primo 1.jpg",
-        "Images/Primo 2.jpg",
-        "Images/Primo 3.jpg",
-        "Images/Primo 4.jpg",
-        "Images/Primo 5.jpg",
-        "Images/Primo 6.jpg",
-        "Images/Primo 7.jpg",
-        "Images/Primo 8 .jpg",
-        "Images/Primo 9.jpg"
+        "images/Panchro 1.jpg",
+        "images/Panchro 2.jpg",
+        "images/Panchro 3.jpg",
+        "images/Panchro 4.jpg",
+        "images/Panchro 5.jpg"
       ],
       "Super Speed": [
-        "Images/Super Speed 1.jpg",
-        "Images/Super Speed 2.jpg",
-        "Images/Super Speed 3.jpg",
-        "Images/Super Speed 4.jpg",
-        "Images/Super Speed 5.jpg",
-        "Images/Super Speed 6.jpg",
-        "Images/Super Speed 7.jpg",
-        "Images/Super Speed 8 .jpg",
-        "Images/Super Speed 9 .jpg",
-        "Images/Super Speed 10 .jpg",
-        "Images/Super Speed 11.jpg",
-        "Images/Super Speed 12.jpg"
+        "images/Super Speed 1.jpg",
+        "images/Super Speed 2.jpg",
+        "images/Super Speed 3.jpg",
+        "images/Super Speed 4.jpg",
+        "images/Super Speed 5.jpg"
       ],
       "Ultra Prime": [
-        "Images/Ultra Prime 1.jpg",
-        "Images/Ultra Prime 2.jpg",
-        "Images/Ultra Prime 3.jpg",
-        "Images/Ultra Prime 4.jpg",
-        "Images/Ultra Prime 5.jpg",
-        "Images/Ultra Prime 6.jpg",
-        "Images/Ultra Prime 7.jpg"
+        "images/Ultra Prime 1.jpg",
+        "images/Ultra Prime 2.jpg",
+        "images/Ultra Prime 3.jpg",
+        "images/Ultra Prime 4.jpg",
+        "images/Ultra Prime 5.jpg"
+      ],
+      // voorbeeld extra set:
+      "Cooke Panchro FF": [
+        "images/Panchro FF 1.jpg",
+        "images/Panchro FF 2.jpg",
+        "images/Panchro FF 3.jpg",
+        "images/Panchro FF 4.jpg",
+        "images/Panchro FF 5.jpg"
       ]
     };
 
-    const IMAGES_PER_LENS = 5;    // precies 5 per serie per run
+    const IMAGES_PER_LENS = 5;
     const MAX_SUPERLIKES = 3;
 
-    let deck = [];                // { lens, src }
+    /********************************************************
+     * STATE
+     ********************************************************/
+    let deck = []; // { lens, src }
     let currentIndex = 0;
-    let scores = {};              // lens -> score
-    let counts = {};              // lens -> { likes, superlikes, views }
+    let scores = {}; // lensName -> score
+    let counts = {}; // lensName -> { likes, superlikes, views }
     let superlikesLeft = MAX_SUPERLIKES;
     let finished = false;
 
+    /********************************************************
+     * DOM ELEMENTS
+     ********************************************************/
     const lensNameEl = document.getElementById("lensName");
     const cardIndexEl = document.getElementById("cardIndex");
     const cardBodyEl = document.getElementById("cardBody");
@@ -590,19 +616,9 @@
     const collageContainerEl = document.getElementById("collageContainer");
     const btnRestart = document.getElementById("btnRestart");
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-
-    function pickRandomN(arr, n) {
-      const copy = arr.slice();
-      shuffle(copy);
-      return copy.slice(0, n);
-    }
-
+    /********************************************************
+     * INIT
+     ********************************************************/
     function initRun() {
       finished = false;
       currentIndex = 0;
@@ -611,67 +627,105 @@
       counts = {};
       superlikesLeft = MAX_SUPERLIKES;
       updateSuperText();
-      resultsSection.classList.add("hidden");
 
+      // Build deck (exact 5 images per lens)
       const lensNames = Object.keys(lensConfig);
       lensNames.forEach((lens) => {
         const imgs = lensConfig[lens];
-        if (!imgs || imgs.length === 0) return;
-        const chosen = pickRandomN(imgs, Math.min(IMAGES_PER_LENS, imgs.length));
-        chosen.forEach((src) => deck.push({ lens, src }));
+        if (!imgs || imgs.length < IMAGES_PER_LENS) {
+          console.warn(
+            `Lens ${lens} has less than ${IMAGES_PER_LENS} images configured.`
+          );
+        }
+        const use = imgs.slice(0, IMAGES_PER_LENS);
+        use.forEach((src) => deck.push({ lens, src }));
+
         scores[lens] = 0;
         counts[lens] = { likes: 0, superlikes: 0, views: 0 };
       });
 
+      // Shuffle
       shuffle(deck);
+
+      // Hide results and show main
+      resultsSection.classList.add("hidden");
+
       renderCurrentCard();
     }
 
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    /********************************************************
+     * RENDER CARD
+     ********************************************************/
     function renderCurrentCard() {
       const total = deck.length;
+
       if (currentIndex >= total) {
         endRun();
         return;
       }
+
       const { lens, src } = deck[currentIndex];
+
       lensNameEl.textContent = lens;
       cardIndexEl.textContent = `${currentIndex + 1} / ${total}`;
 
+      // update per-lens info
       const c = counts[lens];
-      perLensInfoEl.textContent =
-        `For this lens: likes ${c.likes}, superlikes ${c.superlikes} (seen ${c.views}/${IMAGES_PER_LENS} stills)`;
+      perLensInfoEl.textContent = `For this lens: likes ${c.likes}, superlikes ${c.superlikes} (seen ${
+        c.views
+      }/${IMAGES_PER_LENS} stills)`;
 
-      const progress = (currentIndex / total) * 100;
+      // update progress bar
+      const progress = ((currentIndex) / total) * 100;
       progressBarEl.style.width = progress + "%";
 
+      // update image
       cardBodyEl.innerHTML = "";
       const img = document.createElement("img");
       img.src = src;
       img.alt = `${lens} still`;
       cardBodyEl.appendChild(img);
 
+      // mark view
       counts[lens].views++;
     }
 
+    /********************************************************
+     * ACTIONS (LIKE / DISLIKE / SUPERLIKE)
+     ********************************************************/
     function handleLike(isSuper = false) {
       if (finished) return;
       const current = deck[currentIndex];
       if (!current) return;
+
       const lens = current.lens;
 
       if (isSuper) {
-        if (superlikesLeft <= 0) return;
+        if (superlikesLeft <= 0) {
+          // niks meer
+          return;
+        }
         scores[lens] += 2;
         counts[lens].superlikes++;
         superlikesLeft--;
         updateSuperText();
         flashButton(btnSuper);
-        if (superlikesLeft <= 0) btnSuper.classList.add("disabled");
+        if (superlikesLeft <= 0) {
+          btnSuper.classList.add("disabled");
+        }
       } else {
         scores[lens] += 1;
         counts[lens].likes++;
         flashButton(btnLike);
       }
+
       nextCard();
     }
 
@@ -695,39 +749,49 @@
       superStatusEl.textContent = `${superlikesLeft} superlikes remaining`;
       superRemainingTextEl.textContent =
         superlikesLeft > 0
-          ? `You can still drop ${superlikesLeft}★ superlike${superlikesLeft === 1 ? "" : "s"}.`
+          ? `You can still drop ${superlikesLeft}★ superlike${
+              superlikesLeft === 1 ? "" : "s"
+            }.`
           : "No superlikes left in this run.";
-      if (superlikesLeft <= 0) btnSuper.classList.add("disabled");
-      else btnSuper.classList.remove("disabled");
+      if (superlikesLeft <= 0) {
+        btnSuper.classList.add("disabled");
+      } else {
+        btnSuper.classList.remove("disabled");
+      }
     }
 
+    /********************************************************
+     * END OF RUN
+     ********************************************************/
     function endRun() {
       finished = true;
       progressBarEl.style.width = "100%";
       cardIndexEl.textContent = `${deck.length} / ${deck.length}`;
 
+      // sort scores
       const entries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
       const top3 = entries.slice(0, 3);
 
+      // Fill top-list
       topListEl.innerHTML = "";
-      top3.forEach(([lens, score]) => {
-        const c = counts[lens];
+      top3.forEach(([lens, score], idx) => {
         const li = document.createElement("li");
-        li.innerHTML = `<strong>${lens}</strong> — ${score} pts (likes: ${c.likes}, superlikes: ${c.superlikes})`;
+        const c = counts[lens];
+        li.innerHTML = `<strong>${lens}</strong> &mdash; ${score} pts (likes: ${c.likes}, superlikes: ${c.superlikes})`;
         topListEl.appendChild(li);
       });
 
+      // Build collage for winner
       collageContainerEl.innerHTML = "";
       if (top3.length > 0) {
         const [winnerLens] = top3[0];
-        const imgs = lensConfig[winnerLens] || [];
-        const chosen = pickRandomN(imgs, Math.min(IMAGES_PER_LENS, imgs.length));
+        const imgs = (lensConfig[winnerLens] || []).slice(0, IMAGES_PER_LENS);
 
-        if (chosen.length > 0) {
+        if (imgs.length > 0) {
           const collage = document.createElement("div");
           collage.className = "collage";
 
-          chosen.forEach((src, i) => {
+          imgs.forEach((src, i) => {
             const div = document.createElement("div");
             div.className = `collage-item-${i + 1}`;
             const img = document.createElement("img");
@@ -741,7 +805,7 @@
 
           const cap = document.createElement("div");
           cap.className = "collage-caption";
-          cap.textContent = `${winnerLens} — collage of 5 stills from your winning lens.`;
+          cap.textContent = `${winnerLens} — collage of your 5 test stills.`;
           collageContainerEl.appendChild(cap);
         }
       }
@@ -749,6 +813,9 @@
       resultsSection.classList.remove("hidden");
     }
 
+    /********************************************************
+     * EVENT LISTENERS
+     ********************************************************/
     btnLike.addEventListener("click", () => handleLike(false));
     btnDislike.addEventListener("click", handleDislike);
     btnSuper.addEventListener("click", () => {
@@ -760,15 +827,24 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
+    // Keyboard controls
     document.addEventListener("keydown", (e) => {
       if (finished) return;
-      if (e.key === "ArrowLeft") handleDislike();
-      else if (e.key === "ArrowRight") handleLike(false);
-      else if (e.key === "ArrowUp" || e.key === " ") {
-        if (superlikesLeft > 0) handleLike(true);
+      if (e.key === "ArrowLeft") {
+        handleDislike();
+      } else if (e.key === "ArrowRight") {
+        handleLike(false);
+      } else if (e.key === "ArrowUp" || e.key === " ") {
+        // superlike
+        if (superlikesLeft > 0) {
+          handleLike(true);
+        }
       }
     });
 
+    /********************************************************
+     * START
+     ********************************************************/
     initRun();
   </script>
 </body>
