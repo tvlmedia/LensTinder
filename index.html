@@ -573,7 +573,7 @@
       ]
     };
 
-    const Images_PER_LENS = 5;
+const IMAGES_PER_LENS = 5;
     const MAX_SUPERLIKES = 3;
 
     /********************************************************
@@ -589,11 +589,11 @@
     /********************************************************
      * DOM ELEMENTS
      ********************************************************/
-    const lensNameEl = document.getElementById("lensName");
     const cardIndexEl = document.getElementById("cardIndex");
-    const cardBodyEl = document.getElementById("cardBody");
-    const perLensInfoEl = document.getElementById("perLensInfo");
-    const progressBarEl = document.getElementById("progressBar");
+const cardBodyEl = document.getElementById("cardBody");
+const progressBarEl = document.getElementById("progressBar");
+const superStatusEl = document.getElementById("superStatus");
+const superRemainingTextEl = document.getElementById("superRemainingText");
     const superStatusEl = document.getElementById("superStatus");
     const superRemainingTextEl = document.getElementById("superRemainingText");
 
@@ -663,29 +663,18 @@
 
       const { lens, src } = deck[currentIndex];
 
-      lensNameEl.textContent = lens;
-      cardIndexEl.textContent = `${currentIndex + 1} / ${total}`;
+cardIndexEl.textContent = `${currentIndex + 1} / ${total}`;
 
-      // update per-lens info
-      const c = counts[lens];
-      perLensInfoEl.textContent = `For this lens: likes ${c.likes}, superlikes ${c.superlikes} (seen ${
-        c.views
-      }/${Images_PER_LENS} stills)`;
+const progress = (currentIndex / total) * 100;
+progressBarEl.style.width = progress + "%";
 
-      // update progress bar
-      const progress = ((currentIndex) / total) * 100;
-      progressBarEl.style.width = progress + "%";
+cardBodyEl.innerHTML = "";
+const img = document.createElement("img");
+img.src = src;
+img.alt = "Test still";
+cardBodyEl.appendChild(img);
 
-      // update image
-      cardBodyEl.innerHTML = "";
-      const img = document.createElement("img");
-      img.src = src;
-      img.alt = `${lens} still`;
-      cardBodyEl.appendChild(img);
-
-      // mark view
-      counts[lens].views++;
-    }
+counts[lens].views++;
 
     /********************************************************
      * ACTIONS (LIKE / DISLIKE / SUPERLIKE)
