@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lens Tinder – TVL Rental</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    /* =============== GLOBAL =============== */
+    :root {
+      --bg: #050608;
+      --panel: #0d0f13;
+      --panel-soft: rgba(6, 8, 11, 0.95);
+      --border: #242424;
+      --accent: #f5c643; /* Cooke-ish accent */
+      --accent-soft: rgba(245, 198, 67, 0.18);
+      --text: #f7f7f7;
+      --text-muted: #979797;
+      --danger: #ff4a4a;
+      --like: #5ad27c;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-user-drag: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #151820 0, #050608 55%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter",
+        "Helvetica Neue", sans-serif;
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .app {
+      max-width: 1100px;
+      width: 100%;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* =============== HEADER =============== */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .title-block h1 {
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .title-block p {
+      margin: 2px 0 0;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .run-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      align-items: center;
+    }
+
+    .tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* =============== MAIN LAYOUT =============== */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr);
+      margin-top: 4px;
+    }
+
+    .card-shell {
+      background: linear-gradient(145deg, #080a0f, #10131b);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      padding: 18px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-shell::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(
+        circle at 0 0,
+        rgba(245, 198, 67, 0.12),
+        transparent 55%
+      );
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .card-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .lens-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .lens-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .card-index {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .card-body {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #262a33 0, #14171f 40%, #050608 100%);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .card-body img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    .card-footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 6px;
+    }
+
+    .hint-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* =============== CONTROLS =============== */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      background: #181b23;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        border-color 0.08s ease-out, background 0.12s ease-out;
+    }
+
+    .btn span.icon {
+      font-size: 1.2rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-like {
+      background: radial-gradient(circle at top, rgba(90, 210, 124, 0.3), #151f18);
+      border-color: rgba(90, 210, 124, 0.7);
+    }
+
+    .btn-dislike {
+      background: radial-gradient(circle at top, rgba(255, 74, 74, 0.3), #221215);
+      border-color: rgba(255, 74, 74, 0.7);
+    }
+
+    .btn-super {
+      background: radial-gradient(circle at top, rgba(245, 198, 67, 0.35), #251f0f);
+      border-color: rgba(245, 198, 67, 0.9);
+    }
+
+    .btn-super.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+
+    .super-remaining {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      min-width: 130px;
+      text-align: right;
+    }
+
+    /* =============== PROGRESS BAR =============== */
+    .progress-wrapper {
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(
+        90deg,
+        rgba(245, 198, 67, 0.1) 0%,
+        var(--accent) 55%,
+        #ffffff 100%
+      );
+      transform-origin: left center;
+      transition: width 0.16s ease-out;
+    }
+
+    /* =============== RESULTS =============== */
+    #results {
+      margin-top: 16px;
+      padding: 16px 18px 18px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, #171924 0, #090b11 40%, #050608 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    #results h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.8fr);
+      gap: 18px;
+    }
+
+    .toplist {
+      font-size: 0.9rem;
+    }
+
+    .toplist ol {
+      padding-left: 18px;
+      margin: 6px 0 10px;
+    }
+
+    .toplist li {
+      margin-bottom: 4px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(245, 198, 67, 0.18);
+      border: 1px solid rgba(245, 198, 67, 0.7);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+    }
+
+    .restart {
+      margin-top: 10px;
+    }
+
+    /* Collage layout */
+    .collage {
+      display: grid;
+      grid-template-columns: 2fr 1.4fr;
+      grid-template-rows: 1.2fr 1fr 1fr;
+      gap: 6px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #050608;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .collage img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .collage-item-1 { grid-column: 1 / 2; grid-row: 1 / 3; }
+    .collage-item-2 { grid-column: 2 / 3; grid-row: 1 / 2; }
+    .collage-item-3 { grid-column: 2 / 3; grid-row: 2 / 3; }
+    .collage-item-4 { grid-column: 1 / 2; grid-row: 3 / 4; }
+    .collage-item-5 { grid-column: 2 / 3; grid-row: 3 / 4; }
+
+    .collage-caption {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 900px) {
+      .results-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app { padding: 10px; }
+      .card-shell { padding: 14px 12px 12px; }
+      .controls { gap: 10px; }
+      .btn { padding: 8px 14px; font-size: 0.8rem; }
+      .card-body img { max-height: 60vh; }
+      .run-meta { flex-wrap: wrap; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-block">
+        <h1>Lens Tinder</h1>
+        <p>Swipe 35 stills. Vind jouw favoriete lensset.</p>
+      </div>
+      <div class="run-meta">
+        <div class="tag">TVL Rental – Test Build</div>
+        <div id="superStatus" class="tag">3 Superlikes available</div>
+      </div>
+    </header>
+
+    <main>
+      <div class="card-shell">
+        <div class="card-header">
+          <div>
+            <div class="lens-label">Current lens</div>
+            <div id="lensName" class="lens-name">–</div>
+          </div>
+          <div id="cardIndex" class="card-index">0 / 0</div>
+        </div>
+
+        <div class="card-body" id="cardBody"></div>
+
+        <div class="card-footer">
+          <div class="hint-row">
+            <span>Left = Dislike · Right = Like · Up / ★ = Superlike</span>
+            <span id="perLensInfo"></span>
+          </div>
+
+          <div class="controls">
+            <button id="btnDislike" class="btn btn-dislike">
+              <span class="icon">👎</span>
+              <span>Nope</span>
+            </button>
+
+            <button id="btnSuper" class="btn btn-super">
+              <span class="icon">★</span>
+              <span>Superlike</span>
+            </button>
+
+            <button id="btnLike" class="btn btn-like">
+              <span class="icon">👍</span>
+              <span>Like</span>
+            </button>
+
+            <div class="super-remaining" id="superRemainingText"></div>
+          </div>
+
+          <div class="progress-wrapper">
+            <div class="progress-track">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <section id="results" class="hidden">
+      <h2>Results</h2>
+      <div class="results-grid">
+        <div class="toplist">
+          <div style="margin-bottom:6px;">
+            <span class="badge">Top ranked lenses</span>
+          </div>
+          <p style="margin:4px 0 4px;font-size:0.85rem;color:var(--text-muted);">
+            Likes tell you which lens aesthetic fits your taste. Superlikes count as
+            <strong>two likes</strong>.
+          </p>
+          <ol id="topList"></ol>
+          <div class="restart">
+            <button id="btnRestart" class="btn">
+              <span class="icon">↻</span>
+              <span>Run again</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div style="margin-bottom:6px;">
+            <span class="badge">Winner collage</span>
+          </div>
+          <div id="collageContainer"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /********************************************************
+     * CONFIG – deze namen zijn 1-op-1 jouw bestanden.
+     * Zet al je JPGs in de map "Images" naast deze index.html.
+     ********************************************************/
+    const lensConfig = {
+      "Blackwing": [
+        "Images/Blackwing 1.jpg",
+        "Images/Blackwing 2.jpg",
+        "Images/Blackwing 3.jpg",
+        "Images/Blackwing 4.jpg",
+        "Images/Blackwing 5.jpg",
+        "Images/Blackwing 6.jpg",
+        "Images/Blackwing 7 .jpg",
+        "Images/Blackwing 8.jpg",
+        "Images/Blackwing 9 .jpg",
+        "Images/Blackwing 10.jpg"
+      ],
+      "IronGlass": [
+        "Images/IronGlass 1.jpg",
+        "Images/IronGlass 2.jpg",
+        "Images/IronGlass 3.jpg",
+        "Images/IronGlass 4.jpg",
+        "Images/IronGlass 5.jpg",
+        "Images/IronGlass 6.jpg",
+        "Images/IronGlass 7.jpg"
+      ],
+      "Leica R": [
+        "Images/Leica R 1.jpg",
+        "Images/Leica R 2.jpg",
+        "Images/Leica R 3.jpg",
+        "Images/Leica R 4.jpg",
+        "Images/Leica R 5.jpg",
+        "Images/Leica R 6.jpg",
+        "Images/Leica R 7.jpg",
+        "Images/Leica R 8.jpg"
+      ],
+      "Panchro": [
+        "Images/Panchro 1.jpg",
+        "Images/Panchro 2.jpg",
+        "Images/Panchro 3.jpg",
+        "Images/Panchro 4.jpg",
+        "Images/Panchro 5.jpg",
+        "Images/Panchro 6.jpg",
+        "Images/Panchro 7.jpg",
+        "Images/Panchro 8 .jpg",
+        "Images/Panchro 9.jpg",
+        "Images/Panchro 10.jpg"
+      ],
+      "Primo": [
+        "Images/Primo 1.jpg",
+        "Images/Primo 2.jpg",
+        "Images/Primo 3.jpg",
+        "Images/Primo 4.jpg",
+        "Images/Primo 5.jpg",
+        "Images/Primo 6.jpg",
+        "Images/Primo 7.jpg",
+        "Images/Primo 8 .jpg",
+        "Images/Primo 9.jpg"
+      ],
+      "Super Speed": [
+        "Images/Super Speed 1.jpg",
+        "Images/Super Speed 2.jpg",
+        "Images/Super Speed 3.jpg",
+        "Images/Super Speed 4.jpg",
+        "Images/Super Speed 5.jpg",
+        "Images/Super Speed 6.jpg",
+        "Images/Super Speed 7.jpg",
+        "Images/Super Speed 8 .jpg",
+        "Images/Super Speed 9 .jpg",
+        "Images/Super Speed 10 .jpg",
+        "Images/Super Speed 11.jpg",
+        "Images/Super Speed 12.jpg"
+      ],
+      "Ultra Prime": [
+        "Images/Ultra Prime 1.jpg",
+        "Images/Ultra Prime 2.jpg",
+        "Images/Ultra Prime 3.jpg",
+        "Images/Ultra Prime 4.jpg",
+        "Images/Ultra Prime 5.jpg",
+        "Images/Ultra Prime 6.jpg",
+        "Images/Ultra Prime 7.jpg"
+      ]
+    };
+
+    const IMAGES_PER_LENS = 5;    // precies 5 per serie per run
+    const MAX_SUPERLIKES = 3;
+
+    let deck = [];                // { lens, src }
+    let currentIndex = 0;
+    let scores = {};              // lens -> score
+    let counts = {};              // lens -> { likes, superlikes, views }
+    let superlikesLeft = MAX_SUPERLIKES;
+    let finished = false;
+
+    const lensNameEl = document.getElementById("lensName");
+    const cardIndexEl = document.getElementById("cardIndex");
+    const cardBodyEl = document.getElementById("cardBody");
+    const perLensInfoEl = document.getElementById("perLensInfo");
+    const progressBarEl = document.getElementById("progressBar");
+    const superStatusEl = document.getElementById("superStatus");
+    const superRemainingTextEl = document.getElementById("superRemainingText");
+
+    const btnLike = document.getElementById("btnLike");
+    const btnDislike = document.getElementById("btnDislike");
+    const btnSuper = document.getElementById("btnSuper");
+
+    const resultsSection = document.getElementById("results");
+    const topListEl = document.getElementById("topList");
+    const collageContainerEl = document.getElementById("collageContainer");
+    const btnRestart = document.getElementById("btnRestart");
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function pickRandomN(arr, n) {
+      const copy = arr.slice();
+      shuffle(copy);
+      return copy.slice(0, n);
+    }
+
+    function initRun() {
+      finished = false;
+      currentIndex = 0;
+      deck = [];
+      scores = {};
+      counts = {};
+      superlikesLeft = MAX_SUPERLIKES;
+      updateSuperText();
+      resultsSection.classList.add("hidden");
+
+      const lensNames = Object.keys(lensConfig);
+      lensNames.forEach((lens) => {
+        const imgs = lensConfig[lens];
+        if (!imgs || imgs.length === 0) return;
+        const chosen = pickRandomN(imgs, Math.min(IMAGES_PER_LENS, imgs.length));
+        chosen.forEach((src) => deck.push({ lens, src }));
+        scores[lens] = 0;
+        counts[lens] = { likes: 0, superlikes: 0, views: 0 };
+      });
+
+      shuffle(deck);
+      renderCurrentCard();
+    }
+
+    function renderCurrentCard() {
+      const total = deck.length;
+      if (currentIndex >= total) {
+        endRun();
+        return;
+      }
+      const { lens, src } = deck[currentIndex];
+      lensNameEl.textContent = lens;
+      cardIndexEl.textContent = `${currentIndex + 1} / ${total}`;
+
+      const c = counts[lens];
+      perLensInfoEl.textContent =
+        `For this lens: likes ${c.likes}, superlikes ${c.superlikes} (seen ${c.views}/${IMAGES_PER_LENS} stills)`;
+
+      const progress = (currentIndex / total) * 100;
+      progressBarEl.style.width = progress + "%";
+
+      cardBodyEl.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = `${lens} still`;
+      cardBodyEl.appendChild(img);
+
+      counts[lens].views++;
+    }
+
+    function handleLike(isSuper = false) {
+      if (finished) return;
+      const current = deck[currentIndex];
+      if (!current) return;
+      const lens = current.lens;
+
+      if (isSuper) {
+        if (superlikesLeft <= 0) return;
+        scores[lens] += 2;
+        counts[lens].superlikes++;
+        superlikesLeft--;
+        updateSuperText();
+        flashButton(btnSuper);
+        if (superlikesLeft <= 0) btnSuper.classList.add("disabled");
+      } else {
+        scores[lens] += 1;
+        counts[lens].likes++;
+        flashButton(btnLike);
+      }
+      nextCard();
+    }
+
+    function handleDislike() {
+      if (finished) return;
+      flashButton(btnDislike);
+      nextCard();
+    }
+
+    function nextCard() {
+      currentIndex++;
+      renderCurrentCard();
+    }
+
+    function flashButton(btn) {
+      btn.classList.add("pulse");
+      setTimeout(() => btn.classList.remove("pulse"), 130);
+    }
+
+    function updateSuperText() {
+      superStatusEl.textContent = `${superlikesLeft} superlikes remaining`;
+      superRemainingTextEl.textContent =
+        superlikesLeft > 0
+          ? `You can still drop ${superlikesLeft}★ superlike${superlikesLeft === 1 ? "" : "s"}.`
+          : "No superlikes left in this run.";
+      if (superlikesLeft <= 0) btnSuper.classList.add("disabled");
+      else btnSuper.classList.remove("disabled");
+    }
+
+    function endRun() {
+      finished = true;
+      progressBarEl.style.width = "100%";
+      cardIndexEl.textContent = `${deck.length} / ${deck.length}`;
+
+      const entries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const top3 = entries.slice(0, 3);
+
+      topListEl.innerHTML = "";
+      top3.forEach(([lens, score]) => {
+        const c = counts[lens];
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${lens}</strong> — ${score} pts (likes: ${c.likes}, superlikes: ${c.superlikes})`;
+        topListEl.appendChild(li);
+      });
+
+      collageContainerEl.innerHTML = "";
+      if (top3.length > 0) {
+        const [winnerLens] = top3[0];
+        const imgs = lensConfig[winnerLens] || [];
+        const chosen = pickRandomN(imgs, Math.min(IMAGES_PER_LENS, imgs.length));
+
+        if (chosen.length > 0) {
+          const collage = document.createElement("div");
+          collage.className = "collage";
+
+          chosen.forEach((src, i) => {
+            const div = document.createElement("div");
+            div.className = `collage-item-${i + 1}`;
+            const img = document.createElement("img");
+            img.src = src;
+            img.alt = `${winnerLens} collage still ${i + 1}`;
+            div.appendChild(img);
+            collage.appendChild(div);
+          });
+
+          collageContainerEl.appendChild(collage);
+
+          const cap = document.createElement("div");
+          cap.className = "collage-caption";
+          cap.textContent = `${winnerLens} — collage of 5 stills from your winning lens.`;
+          collageContainerEl.appendChild(cap);
+        }
+      }
+
+      resultsSection.classList.remove("hidden");
+    }
+
+    btnLike.addEventListener("click", () => handleLike(false));
+    btnDislike.addEventListener("click", handleDislike);
+    btnSuper.addEventListener("click", () => {
+      if (superlikesLeft > 0) handleLike(true);
+    });
+
+    btnRestart.addEventListener("click", () => {
+      initRun();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (finished) return;
+      if (e.key === "ArrowLeft") handleDislike();
+      else if (e.key === "ArrowRight") handleLike(false);
+      else if (e.key === "ArrowUp" || e.key === " ") {
+        if (superlikesLeft > 0) handleLike(true);
+      }
+    });
+
+    initRun();
+  </script>
+</body>
+</html>
