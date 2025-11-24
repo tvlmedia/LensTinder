@@ -527,63 +527,63 @@
     /********************************************************
      * CONFIG – PAS DIT AAN NAAR JOUW BESTANDEN
      *
-     * Zet je JPG's bijv. in /images en zorg dat de paden kloppen.
+     * Zet je JPG's bijv. in /Images en zorg dat de paden kloppen.
      * Elke lens-serie moet EXACT 5 stills hebben.
      ********************************************************/
     const lensConfig = {
       "Primo": [
-        "images/Primo 1.jpg",
-        "images/Primo 2.jpg",
-        "images/Primo 3.jpg",
-        "images/Primo 4.jpg",
-        "images/Primo 5.jpg"
+        "Images/Primo 1.jpg",
+        "Images/Primo 2.jpg",
+        "Images/Primo 3.jpg",
+        "Images/Primo 4.jpg",
+        "Images/Primo 5.jpg"
       ],
       "IronGlass": [
-        "images/IronGlass 1.jpg",
-        "images/IronGlass 2.jpg",
-        "images/IronGlass 3.jpg",
-        "images/IronGlass 4.jpg",
-        "images/IronGlass 5.jpg"
+        "Images/IronGlass 1.jpg",
+        "Images/IronGlass 2.jpg",
+        "Images/IronGlass 3.jpg",
+        "Images/IronGlass 4.jpg",
+        "Images/IronGlass 5.jpg"
       ],
       "Blackwing": [
-        "images/Blackwing 1.jpg",
-        "images/Blackwing 2.jpg",
-        "images/Blackwing 3.jpg",
-        "images/Blackwing 4.jpg",
-        "images/Blackwing 5.jpg"
+        "Images/Blackwing 1.jpg",
+        "Images/Blackwing 2.jpg",
+        "Images/Blackwing 3.jpg",
+        "Images/Blackwing 4.jpg",
+        "Images/Blackwing 5.jpg"
       ],
       "Panchro": [
-        "images/Panchro 1.jpg",
-        "images/Panchro 2.jpg",
-        "images/Panchro 3.jpg",
-        "images/Panchro 4.jpg",
-        "images/Panchro 5.jpg"
+        "Images/Panchro 1.jpg",
+        "Images/Panchro 2.jpg",
+        "Images/Panchro 3.jpg",
+        "Images/Panchro 4.jpg",
+        "Images/Panchro 5.jpg"
       ],
       "Super Speed": [
-        "images/Super Speed 1.jpg",
-        "images/Super Speed 2.jpg",
-        "images/Super Speed 3.jpg",
-        "images/Super Speed 4.jpg",
-        "images/Super Speed 5.jpg"
+        "Images/Super Speed 1.jpg",
+        "Images/Super Speed 2.jpg",
+        "Images/Super Speed 3.jpg",
+        "Images/Super Speed 4.jpg",
+        "Images/Super Speed 5.jpg"
       ],
       "Ultra Prime": [
-        "images/Ultra Prime 1.jpg",
-        "images/Ultra Prime 2.jpg",
-        "images/Ultra Prime 3.jpg",
-        "images/Ultra Prime 4.jpg",
-        "images/Ultra Prime 5.jpg"
+        "Images/Ultra Prime 1.jpg",
+        "Images/Ultra Prime 2.jpg",
+        "Images/Ultra Prime 3.jpg",
+        "Images/Ultra Prime 4.jpg",
+        "Images/Ultra Prime 5.jpg"
       ],
       // voorbeeld extra set:
       "Cooke Panchro FF": [
-        "images/Panchro FF 1.jpg",
-        "images/Panchro FF 2.jpg",
-        "images/Panchro FF 3.jpg",
-        "images/Panchro FF 4.jpg",
-        "images/Panchro FF 5.jpg"
+        "Images/Panchro FF 1.jpg",
+        "Images/Panchro FF 2.jpg",
+        "Images/Panchro FF 3.jpg",
+        "Images/Panchro FF 4.jpg",
+        "Images/Panchro FF 5.jpg"
       ]
     };
 
-    const IMAGES_PER_LENS = 5;
+    const Images_PER_LENS = 5;
     const MAX_SUPERLIKES = 3;
 
     /********************************************************
@@ -628,16 +628,16 @@
       superlikesLeft = MAX_SUPERLIKES;
       updateSuperText();
 
-      // Build deck (exact 5 images per lens)
+      // Build deck (exact 5 Images per lens)
       const lensNames = Object.keys(lensConfig);
       lensNames.forEach((lens) => {
         const imgs = lensConfig[lens];
-        if (!imgs || imgs.length < IMAGES_PER_LENS) {
+        if (!imgs || imgs.length < Images_PER_LENS) {
           console.warn(
-            `Lens ${lens} has less than ${IMAGES_PER_LENS} images configured.`
+            `Lens ${lens} has less than ${Images_PER_LENS} Images configured.`
           );
         }
-        const use = imgs.slice(0, IMAGES_PER_LENS);
+        const use = imgs.slice(0, Images_PER_LENS);
         use.forEach((src) => deck.push({ lens, src }));
 
         scores[lens] = 0;
@@ -680,7 +680,7 @@
       const c = counts[lens];
       perLensInfoEl.textContent = `For this lens: likes ${c.likes}, superlikes ${c.superlikes} (seen ${
         c.views
-      }/${IMAGES_PER_LENS} stills)`;
+      }/${Images_PER_LENS} stills)`;
 
       // update progress bar
       const progress = ((currentIndex) / total) * 100;
@@ -785,7 +785,7 @@
       collageContainerEl.innerHTML = "";
       if (top3.length > 0) {
         const [winnerLens] = top3[0];
-        const imgs = (lensConfig[winnerLens] || []).slice(0, IMAGES_PER_LENS);
+        const imgs = (lensConfig[winnerLens] || []).slice(0, Images_PER_LENS);
 
         if (imgs.length > 0) {
           const collage = document.createElement("div");
