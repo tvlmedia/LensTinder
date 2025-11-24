@@ -396,7 +396,7 @@
       </div>
       <div class="run-meta">
         <div class="tag">TVL Rental – Test Build</div>
-        <div id="superStatus" class="tag">3 superlikes remaining</div>
+        <div id="superStatus" class="tag">Loading…</div>
       </div>
     </header>
 
@@ -409,7 +409,9 @@
           <div id="cardIndex" class="card-index">0 / 0</div>
         </div>
 
-        <div class="card-body" id="cardBody"></div>
+        <div class="card-body" id="cardBody">
+          <span style="font-size:0.9rem;color:var(--text-muted);">Loading stills…</span>
+        </div>
 
         <div class="card-footer">
           <div class="hint-row">
@@ -476,63 +478,40 @@
 
   <script>
     /********************************************************
-     * CONFIG – namen komen overeen met jouw map Images/
+     * CONFIG – hier hoef je alleen lensnamen toe te voegen.
+     * Voor elke lens:
+     *   Images/Lensnaam 1.jpg
+     *   Images/Lensnaam 2.jpg
+     *   Images/Lensnaam 3.jpg
+     *   ...
      ********************************************************/
-    const lensConfig = {
-      "Primo": [
-        "Images/Primo 1.jpg",
-        "Images/Primo 2.jpg",
-        "Images/Primo 3.jpg",
-        "Images/Primo 4.jpg",
-        "Images/Primo 5.jpg"
-      ],
-      "IronGlass": [
-        "Images/IronGlass 1.jpg",
-        "Images/IronGlass 2.jpg",
-        "Images/IronGlass 3.jpg",
-        "Images/IronGlass 4.jpg",
-        "Images/IronGlass 5.jpg"
-      ],
-      "Blackwing": [
-        "Images/Blackwing 1.jpg",
-        "Images/Blackwing 2.jpg",
-        "Images/Blackwing 3.jpg",
-        "Images/Blackwing 4.jpg",
-        "Images/Blackwing 5.jpg"
-      ],
-      "Panchro": [
-        "Images/Panchro 1.jpg",
-        "Images/Panchro 2.jpg",
-        "Images/Panchro 3.jpg",
-        "Images/Panchro 4.jpg",
-        "Images/Panchro 5.jpg"
-      ],
-      "Super Speed": [
-        "Images/Super Speed 1.jpg",
-        "Images/Super Speed 2.jpg",
-        "Images/Super Speed 3.jpg",
-        "Images/Super Speed 4.jpg",
-        "Images/Super Speed 5.jpg"
-      ],
-      "Ultra Prime": [
-        "Images/Ultra Prime 1.jpg",
-        "Images/Ultra Prime 2.jpg",
-        "Images/Ultra Prime 3.jpg",
-        "Images/Ultra Prime 4.jpg",
-        "Images/Ultra Prime 5.jpg"
-      ]
-    };
+    const LENS_NAMES = [
+      "Primo",
+      "IronGlass",
+      "Blackwing",
+      "Panchro",
+      "Super Speed",
+      "Ultra Prime",
+      "Kowa Cine Prominar",
+      "Super Baltar",
+      "K35"
+      // voeg hier gewoon nieuwe namen toe
+    ];
 
-    const IMAGES_PER_LENS = 5;
+    const IMAGES_PER_LENS = 5;       // 5 stills per lens in de run
+    const TOTAL_SWIPES = 35;         // altijd 35 swipes
+    const LENSES_PER_RUN = TOTAL_SWIPES / IMAGES_PER_LENS; // 7
     const MAX_SUPERLIKES = 3;
 
     /* STATE */
-    let deck = []; // { lens, src }
+    let lensConfig = {}; // lens -> [urls]
+    let deck = [];       // { lens, src }
     let currentIndex = 0;
-    let scores = {}; // lens -> score
-    let counts = {}; // lens -> { likes, superlikes, views }
+    let scores = {};     // lens -> score
+    let counts = {};     // lens -> { likes, superlikes, views }
     let superlikesLeft = MAX_SUPERLIKES;
     let finished = false;
+    let initialized = false;
 
     /* DOM */
     const cardIndexEl = document.getElementById("cardIndex");
@@ -550,6 +529,7 @@
     const collageContainerEl = document.getElementById("collageContainer");
     const btnRestart = document.getElementById("btnRestart");
 
+    /********************* HELPERS **************************/
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -563,6 +543,42 @@
       return copy.slice(0, n);
     }
 
+    function imageExists(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
+    }
+
+    async function discoverImagesForLens(lensName) {
+      const images = [];
+      let index = 1;
+      while (true) {
+        const url = `Images/${lensName} ${index}.jpg`;
+        // we stoppen bij de eerste die niet bestaat (aanname: geen gaten)
+        const ok = await imageExists(url);
+        if (!ok) break;
+        images.push(url);
+        index++;
+      }
+      return images;
+    }
+
+    async function buildLensConfig() {
+      const cfg = {};
+      for (const lens of LENS_NAMES) {
+        const imgs = await discoverImagesForLens(lens);
+        if (imgs.length > 0) {
+          cfg[lens] = imgs;
+        } else {
+          console.warn(`No images found for lens "${lens}".`);
+        }
+      }
+      return cfg;
+    }
+
     function updateSuperText() {
       superStatusEl.textContent = `${superlikesLeft} superlikes remaining`;
       superRemainingTextEl.textContent =
@@ -573,6 +589,7 @@
       else btnSuper.classList.remove("disabled");
     }
 
+    /********************** INIT RUN ************************/
     function initRun() {
       finished = false;
       currentIndex = 0;
@@ -583,10 +600,22 @@
       updateSuperText();
       resultsSection.classList.add("hidden");
 
-      const lensNames = Object.keys(lensConfig);
-      lensNames.forEach((lens) => {
+      const allLensNames = Object.keys(lensConfig).filter(
+        (lens) => lensConfig[lens].length >= IMAGES_PER_LENS
+      );
+
+      if (allLensNames.length === 0) {
+        cardBodyEl.innerHTML =
+          '<span style="font-size:0.9rem;color:var(--text-muted);">No valid lenses found. Check your Images/ folder.</span>';
+        superStatusEl.textContent = "Error";
+        return;
+      }
+
+      shuffle(allLensNames);
+      const lensesToUse = allLensNames.slice(0, Math.min(LENSES_PER_RUN, allLensNames.length));
+
+      lensesToUse.forEach((lens) => {
         const imgs = lensConfig[lens];
-        if (!imgs || imgs.length === 0) return;
         const chosen = pickRandomN(imgs, Math.min(IMAGES_PER_LENS, imgs.length));
         chosen.forEach((src) => deck.push({ lens, src }));
         scores[lens] = 0;
@@ -595,8 +624,10 @@
 
       shuffle(deck);
       renderCurrentCard();
+      initialized = true;
     }
 
+    /******************** RENDER CARD ***********************/
     function renderCurrentCard() {
       const total = deck.length;
       if (currentIndex >= total) {
@@ -606,12 +637,10 @@
 
       const { lens, src } = deck[currentIndex];
 
-      // teller & progress
       cardIndexEl.textContent = `${currentIndex + 1} / ${total}`;
       const progress = (currentIndex / total) * 100;
       progressBarEl.style.width = progress + "%";
 
-      // beeld
       cardBodyEl.innerHTML = "";
       const img = document.createElement("img");
       img.src = src;
@@ -631,8 +660,9 @@
       renderCurrentCard();
     }
 
+    /******************** ACTIONS ***************************/
     function handleLike(isSuper = false) {
-      if (finished) return;
+      if (finished || !initialized) return;
       const current = deck[currentIndex];
       if (!current) return;
       const lens = current.lens;
@@ -644,25 +674,27 @@
         superlikesLeft--;
         updateSuperText();
         flashButton(btnSuper);
-        if (superlikesLeft <= 0) btnSuper.classList.add("disabled");
       } else {
         scores[lens] += 1;
         counts[lens].likes++;
         flashButton(btnLike);
       }
+
       nextCard();
     }
 
     function handleDislike() {
-      if (finished) return;
+      if (finished || !initialized) return;
       flashButton(btnDislike);
       nextCard();
     }
 
+    /********************* END RUN **************************/
     function endRun() {
       finished = true;
+      const total = deck.length;
       progressBarEl.style.width = "100%";
-      cardIndexEl.textContent = `${deck.length} / ${deck.length}`;
+      cardIndexEl.textContent = `${total} / ${total}`;
 
       const entries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
       const top3 = entries.slice(0, 3);
@@ -707,7 +739,7 @@
       resultsSection.classList.remove("hidden");
     }
 
-    /* listeners */
+    /******************** LISTENERS *************************/
     btnLike.addEventListener("click", () => handleLike(false));
     btnDislike.addEventListener("click", handleDislike);
     btnSuper.addEventListener("click", () => {
@@ -720,7 +752,7 @@
     });
 
     document.addEventListener("keydown", (e) => {
-      if (finished) return;
+      if (!initialized || finished) return;
       if (e.key === "ArrowLeft") handleDislike();
       else if (e.key === "ArrowRight") handleLike(false);
       else if (e.key === "ArrowUp" || e.key === " ") {
@@ -728,8 +760,13 @@
       }
     });
 
-    /* start */
-    initRun();
+    /********************** START ***************************/
+    (async function start() {
+      superStatusEl.textContent = "Loading stills…";
+      lensConfig = await buildLensConfig();
+      superStatusEl.textContent = `${MAX_SUPERLIKES} superlikes remaining`;
+      initRun();
+    })();
   </script>
 </body>
 </html>
